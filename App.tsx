@@ -1,23 +1,15 @@
+import { NavigationContainer } from "@react-navigation/native";
+
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import CoIcon from "./src/components/Icon";
 
-
+import RootStack from "./src/navigation/RootStack";
 
 const App = () => {
   return (
-    <View style={styles.container}>
-      <StatusBar hidden  />
-        <Text>Hello</Text>
-        <CoIcon  name="user" family="AntDesign" color={"rgb(100,120,40)"} size={10}     />
-    </View>
+    <NavigationContainer>
+      <StatusBar style="auto" hidden />
+      <RootStack />
+    </NavigationContainer>
   );
-}
-export default App
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent:"center",
-    alignItems:'center'
-  },
-});
+};
+export default App;

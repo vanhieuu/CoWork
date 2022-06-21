@@ -49,7 +49,7 @@ const CoIcon = ({ name, family, size, color, ...rest }: IconProps) =>{
 
   return (
     <View onLayout={onLayoutRootView}>
-      <>
+      
         {family === "ArgonExtra" ? (
           <IconArgonExtra
           key={1}
@@ -71,7 +71,7 @@ const CoIcon = ({ name, family, size, color, ...rest }: IconProps) =>{
             }}
           />
         )}
-      </>
+      
     </View>
   );
 };
