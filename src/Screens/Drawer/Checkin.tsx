@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React from 'react'
+import { CalendarScreen } from '../../components'
+
 
 const Checkin = () => {
   return (
-    <View>
-      <Text>Checkin</Text>
+    <View style={{flex:1}}>
+      <CalendarScreen/>
     </View>
   )
 }

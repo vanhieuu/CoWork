@@ -1,12 +1,13 @@
+import dayjs from "dayjs";
 import React from "react";
 import {
-  Alert,
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   Modal,
-  Pressable,
+  Alert,
+  TextInput,
 } from "react-native";
 import {
   Agenda,
@@ -14,15 +15,43 @@ import {
   AgendaEntry,
   AgendaSchedule,
 } from "react-native-calendars";
+
 import { testId, theme } from "../constants";
 
+import CoInput from "./Input";
+
 const AgendaScreen = () => {
-  const [item, setItem] = React.useState<AgendaSchedule>({});
-  const [task, setTask] = React.useState({
-    taskName: "fix bugđâsdasd",
-    date: new Date().toISOString().split("T")[0],
+  const [task, setTask] = React.useState("task1");
+
+  const [item, setItem] = React.useState<{ [key: string]: AgendaEntry[] }>({
+    day: [
+      {
+        name: `${task}`,
+        day: dayjs(new Date()).format("DD/MM/YYYY"),
+        height: 40,
+      },
+      {
+        name: `task2}`,
+        day: dayjs(new Date()).format("DD/MM/YYYY"),
+        height: 40,
+      },
+    ],
+    day2: [
+      {
+        name: `${task}`,
+        day: dayjs(new Date()).format("DD/MM/YYYY"),
+        height: 40,
+      },
+      {
+        name: `task2}`,
+        day: dayjs(new Date()).format("DD/MM/YYYY"),
+        height: 40,
+      },
+    ],
   });
-  const [modalVisible, setModalVisible] = React.useState(false);
+
+
+
   const timeToString = (time: number) => {
     const date = new Date(time);
     return date.toISOString().split("T")[0];
@@ -32,22 +61,21 @@ const AgendaScreen = () => {
     return date.getDay() === 6 || date.getDay() === 0;
   };
 
-  const loadItems = React.useCallback((day: DateData) => {
+  const loadItems = (day: DateData) => {
     const items = item || {};
 
-    // const time = day.timestamp + i * 24 * 60 * 60 * 1000
     setTimeout(() => {
-      for (let i = -7; i < 7; i++) {
+      for (let i = -2; i < 2; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = timeToString(time);
-
+        
         if (!items[strTime]) {
           items[strTime] = [];
-          if (strTime === task.date) {
+          if (strTime === dayjs(new Date()).format("YYYY-MM-DD")) {
             items[strTime].push({
-              name: `+ ${task.taskName}`,
+              name: `+ ${task}`,
               height: 40,
-              day: task.date,
+              day: dayjs(strTime).format("DD/MM/YYYY"),
             });
           }
           if (isWeekend(new Date(strTime)) === true) {
@@ -65,11 +93,12 @@ const AgendaScreen = () => {
       });
       setItem(newItems);
     }, 1000);
-  }, []);
+  };
 
-  const renderItem = (reservation: AgendaEntry) => {
+  const renderItem = (reservation: AgendaEntry, isFirst: boolean) => {
     return (
       <TouchableOpacity
+        testID={testId.agenda.ITEM}
         style={{
           marginTop: 17,
           marginRight: 10,
@@ -80,23 +109,33 @@ const AgendaScreen = () => {
           flex: 1,
           borderRadius: 10,
         }}
-        onPress={() => setModalVisible(true)}
-        disabled={isWeekend(new Date(reservation.day)) === false ? false : true}
+        onPress={() => {
+          Alert.alert("dcm");
+        }}
       >
-        <View style={[styles.labelContainer]}>
+        <View style={styles.labelContainer}>
           <Text style={styles.textLabel}>{reservation.name}</Text>
         </View>
       </TouchableOpacity>
     );
   };
 
-  const renderEmptyDate = () => {
+  const renderEmptyDate = React.useCallback((data: Date) => {
     return (
-      <View style={styles.emptyDate}>
-        <Text style={styles.textLabel}>Chưa có task </Text>
-      </View>
+      <TouchableOpacity
+        style={styles.emptyDate}
+        onPress={() => console.log(data.toISOString().split("T")[0])}
+      >
+        <View>
+          <Text style={styles.textLabel}>
+            {" "}
+            Chưa có task{" "}
+            {dayjs(data.toISOString().split("T")[0]).format("DD/MM/YYYY")}{" "}
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
-  };
+  }, []);
 
   const rowHasChanged = (r1: AgendaEntry, r2: AgendaEntry) => {
     return r1.name !== r2.name;
@@ -104,52 +143,14 @@ const AgendaScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "red",
-           
-            // flex: 1,
-            marginTop: 100,
-            width: "90%",
-            height: "70%",
-            alignSelf: "center",
-            top:10
-          }}
-        >
-          <View>
-            <View style={{
-                justifyContent:'center',
-                alignItems:'center',
-                marginTop:20
-            }}>
-            <Text>Thêm task cho ngày {task.date}</Text>
-            </View>
-           
-          </View>
-        </View>
-      </Modal>
       <Agenda
-        testID={testId.agenda.CONTAINER}
         items={item}
-        loadItemsForMonth={loadItems}
         selected={new Date().toISOString()}
         renderItem={renderItem}
+        loadItemsForMonth={loadItems}
         renderEmptyDate={renderEmptyDate}
         rowHasChanged={rowHasChanged}
-        showClosingKnob={true}
-        markingType="dot"
-        markedDates={{
-          "2022-06-21": { textColor: "red" },
-        }}
-        monthFormat={"mm"}
+        monthFormat={"MMM"}
       />
     </View>
   );
@@ -168,7 +169,11 @@ const styles = StyleSheet.create({
   emptyDate: {
     height: 15,
     flex: 1,
-    paddingTop: 30,
+    backgroundColor: theme.COLORS.INPUT_ERROR,
+    // margin:20,
+    borderRadius: 10,
+    // padding:10,
+    marginVertical: 10,
   },
   textLabel: {
     fontSize: 16,
@@ -176,7 +181,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 15,
+    marginTop: 8,
     padding: 8,
   },
   labelContainer: {
@@ -184,5 +189,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 5,
+  },
+  modalView: {
+    backgroundColor: theme.COLORS.WARNING,
+    marginTop: 100,
+    width: "90%",
+    height: "70%",
+    alignSelf: "center",
+    top: 10,
+  },
+  textContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonStyle: {
+    backgroundColor: theme.COLORS.ACTIVE,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    marginHorizontal: 50,
+    borderRadius: 20,
+    marginTop: 20,
+  },
+  textButton: {
+    color: "#fff",
+    fontSize: theme.SIZES.BASE,
   },
 });

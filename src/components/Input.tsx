@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { NativeSyntheticEvent, StyleSheet, Text, TextInputSubmitEditingEventData, View, ViewStyle } from "react-native";
 import React from "react";
 import { theme } from "../constants";
 import { Input } from "galio-framework";
@@ -14,6 +14,7 @@ interface InputProps {
   value: string;
   style: ViewStyle;
   secureTextEntry: boolean;
+ onSubmitEditing?: ((e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void) | undefined
 }
 const CoInput = ({
   shadowless,
@@ -24,6 +25,7 @@ const CoInput = ({
   onChangeText,
   value,
   style,
+  onSubmitEditing,
   secureTextEntry,
 }: InputProps) => {
   const inputStyles = [
@@ -42,6 +44,7 @@ const CoInput = ({
       onChangeText={onChangeText}
       value={value}
       color={theme.COLORS.HEADER}
+      onSubmitEditing={onSubmitEditing}
       iconContent={
         <CoIcon
           size={14}
