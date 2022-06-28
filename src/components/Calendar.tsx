@@ -7,7 +7,7 @@ import { testId, theme } from "../constants";
 
 const INITIAL_DATE = new Date().toISOString().split("T")[0];
 
-const INITIAL_IP_ADDRESS = "192.168.1.209";
+const INITIAL_IP_ADDRESS = "10.0.2.16";
 
 const CalendarScreen = () => {
   const [selected, setSelected] = useState(INITIAL_DATE);
@@ -184,6 +184,14 @@ const CalendarScreen = () => {
                 </Text>
               </TouchableOpacity>
             </View>
+            {currentIpAddress.current != INITIAL_IP_ADDRESS && (
+              <View style={styles.handleError}>
+                <Text style={styles.textError}>
+                  Bạn đang chấm công ngoài công ty {currentIpAddress.current},
+                  vui lòng cho biết lý do
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -197,5 +205,15 @@ const styles = StyleSheet.create({
   calendar: {
     marginBottom: 10,
     marginTop: 20,
+  },
+  handleError: {
+    flexWrap: "nowrap",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  textError: {
+    color: "red",
+    textAlign: "center",
   },
 });
