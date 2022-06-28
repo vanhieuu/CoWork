@@ -2,13 +2,14 @@ import { Dimensions, StyleSheet } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import HomeScreen from "../Screens/HomeScreen";
+
 import LoginScreen from "../Screens/loginScreen";
 import Checkin from "../Screens/Drawer/Checkin";
 import Menu from "./Menu";
 import MailScreen from "../Screens/Drawer/MailScreen";
 import Main from "../Screens/Drawer/Main";
 import Approval from "../Screens/Drawer/Approval";
+import TaskWork from "../Screens/AuthScreen/TaskWork";
 
 export type HomeDrawerParamsList = {
   Main: undefined;
@@ -22,6 +23,9 @@ export type RootStackParamList = {
   Home: undefined;
   CheckInScreen: undefined;
   MailScreen: undefined;
+  TaskWork:{
+    task:string
+  }
  
 };
 const { width } = Dimensions.get("screen");
@@ -44,6 +48,14 @@ const RootStack = () => {
         options={{
           headerShown: false,
         }}
+      />
+      <Stack.Screen
+      name='TaskWork'
+      component={TaskWork}
+      options={{
+        headerShown: false,
+      }}
+      
       />
     </Stack.Navigator>
   );

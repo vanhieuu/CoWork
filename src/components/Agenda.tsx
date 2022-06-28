@@ -1,3 +1,4 @@
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import dayjs from "dayjs";
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
@@ -8,51 +9,41 @@ import {
   AgendaSchedule,
 } from "react-native-calendars";
 
-import { testId, theme } from "../constants";
+import { theme } from "../constants";
+import { RootStackParamList } from "../navigation/RootStack";
 
 export type Post = {
   userId: number;
   id: number;
   title: string;
   body: string;
-  date:string
 };
 
 
 
-
 const AgendaScreen = () => {
-  const [task, setTask] = React.useState("task1");
-
-  const [item, setItem] = React.useState<{ [key: string]: Post[] }>({});
-  const [post, setPost] = React.useState<{ [key: string]: Post[] }>({});
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const [items, setItem] = React.useState<AgendaSchedule>({
+    "28/06/2022": [
+      { day: "28/06/2022", height: 40, name: "Task1" },
+      { day: "28/05/2022", height: 40, name: "Task2" },
+    ],
+  });
 
   React.useEffect(() => {
     const getData = async () => {
       const response = await fetch(
-        "https://jsonplaceholder.typicode.com/posts"
+        "https://my-json-server.typicode.com/vanhieuu/fakeData/post"
       );
-      const data: Post[] = await response.json();
-
-      const mappedData = data.map((post) => {
-        return {
-          ...post,
-          date: dayjs(new Date()).format("DD/MM/YYYY"),
-        };
-      });
-      const reduce = mappedData.reduce(
-        (acc: { [key: string]: Post[] }, currentItem) => {
-          const { date, ...coolItem } = currentItem;
-          acc[date] = [coolItem];
-          return acc;
-        },
-        {}
-      );
-      setPost(reduce);
+      const data: AgendaSchedule[] = await response.json();
+      const mappedData = Object.assign({},...data)
+      setItem(mappedData)
+      
     };
 
     getData();
   }, []);
+
   
 
   const timeToString = (time: number) => {
@@ -65,63 +56,64 @@ const AgendaScreen = () => {
   };
 
   const loadItems = (day: DateData) => {
-    const items = item || {};
+    const item = items || {};
 
     setTimeout(() => {
-      for (let i = -2; i < 2; i++) {
+      for (let i = -3; i < 3; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = timeToString(time);
 
-        if (!items[strTime]) {
-          items[strTime] = [];
+        if (!item[strTime]) {
+          item[strTime] = [];
           if (strTime === dayjs(new Date()).format("YYYY-MM-DD")) {
-            items[strTime].push({
-              userId: i++,
-              id: i++,
-              title: task,
-              body: task,
-              date:strTime
+            item[strTime].push({
+              name: `Task${i}`,
+              day: dayjs(strTime).format("DD/MM/YYYY"),
+              height: 40,
             });
           }
           if (isWeekend(new Date(strTime)) === true) {
-            items[strTime].push({
-              userId: i++,
-              id: i++,
-              title: "Ngày nghỉ",
-              body: strTime,
-              date:strTime
+            item[strTime].push({
+              name: "Ngày nghỉ",
+              day: dayjs(strTime).format("DD/MM/YYYY"),
+              height: 40,
             });
           }
         }
       }
-      const newItems: { [key: string]: Post[] } = {};
+      const newItems: AgendaSchedule = {};
       Object.keys(items).forEach((key) => {
-        newItems[key] = items[key];
+        newItems[key] = item[key];
       });
       setItem(newItems);
     }, 1000);
   };
 
-  const renderItem = (item:Post) => {
+  const renderItem = (item: AgendaEntry) => {
+    
     return (
       <TouchableOpacity
-        testID={testId.agenda.ITEM}
         style={{
           marginTop: 17,
           marginRight: 10,
           backgroundColor:
-            isWeekend(new Date(item.date)) === false
+            isWeekend(new Date(dayjs(item.day).format('DD/MM/YYYY'))) === false
               ? theme.COLORS.SUCCESS
               : theme.COLORS.BLOCK,
           flex: 1,
           borderRadius: 10,
+          
         }}
         onPress={() => {
-          Alert.alert("dcm");
+          navigation.navigate('TaskWork',{
+            task:item.name
+          })
+          
         }}
+        disabled={isWeekend(new Date(dayjs(item.day).format('DD/MM/YYYY'))) === true ? true:false}
       >
         <View style={styles.labelContainer}>
-          <Text style={styles.textLabel}>{item.title}</Text>
+          <Text style={styles.textLabel}>{item.name}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -151,7 +143,7 @@ const AgendaScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <Agenda
-        items={post}
+        items={items}
         selected={new Date().toISOString()}
         renderItem={renderItem}
         renderEmptyDate={renderEmptyDate}
