@@ -18,5 +18,8 @@
         "titleBar.inactiveBackground": "#7450a499",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#7450a4"
+    "peacock.color": "#7450a4",
+    "cSpell.words": [
+        "tele"
+    ]
 }

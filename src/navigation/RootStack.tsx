@@ -11,6 +11,7 @@ import Main from "../Screens/Drawer/Main";
 import Approval from "../Screens/Drawer/Approval";
 import TaskWork from "../Screens/AuthScreen/TaskWork";
 import { AgendaEntry } from "react-native-calendars";
+import AddTask from "../Screens/AuthScreen/AddTask";
 
 export type HomeDrawerParamsList = {
   Main: undefined;
@@ -26,7 +27,8 @@ export type RootStackParamList = {
   MailScreen: undefined;
   TaskWork:{
     task:AgendaEntry
-  }
+  },
+  AddTask:undefined
  
 };
 const { width } = Dimensions.get("screen");
@@ -55,6 +57,13 @@ const RootStack = () => {
       component={TaskWork}
       options={{
         headerShown: false,
+      }}
+      />
+      <Stack.Screen
+      name='AddTask'
+      component={AddTask}
+      options={{
+        headerShown:false
       }}
       
       />

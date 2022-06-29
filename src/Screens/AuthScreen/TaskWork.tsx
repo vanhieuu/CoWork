@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/RootStack";
 import { theme } from "../../constants";
 import { CoIcon, CoInput } from "../../components";
@@ -31,7 +31,7 @@ const TaskWork = () => {
   const [tasks, setTasks] = React.useState<TaskProps[]>([]);
   const [textInput, setTextInput] = React.useState("Thêm task");
   const [showMore, setShowMore] = React.useState<boolean>(false);
-
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const addTask = () => {
     const newTask: TaskProps = {
       id: Math.floor(Math.random() * 100),
@@ -107,6 +107,7 @@ const TaskWork = () => {
                     style={[styles.button, styles.buttonClose]}
                     onPress={() => {
                       addTask(), setShow(!show);
+                      navigation.navigate('AddTask')
                     }}
                   >
                     <Text style={styles.textStyle}>Add Task</Text>

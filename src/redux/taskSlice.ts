@@ -11,6 +11,7 @@ const initState: AgendaSchedule = {
       name: "",
       day: "",
       height: 0,
+      hour:''
     },
   ],
 };

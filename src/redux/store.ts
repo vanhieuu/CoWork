@@ -1,9 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import task from './taskSlice'
-
+import tele from './telegramSlice'
 const store = configureStore({
     reducer:{
-        task
+        task,
+        tele
     }
 })
 export default store
