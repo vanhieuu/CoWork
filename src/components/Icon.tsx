@@ -35,6 +35,7 @@ const CoIcon = ({ name, family, size, color, ...rest }: IconProps) =>{
     }
 
     prepare();
+    return undefined;
   }, []);
 
   const onLayoutRootView = React.useCallback(async () => {

@@ -1,0 +1,12 @@
+  {/* <CircularProgress
+        value={value}
+        radius={40}
+        titleFontSize={12}
+        valueSuffix={"m"}
+        inActiveStrokeColor={theme.COLORS.ACTIVE}
+        inActiveStrokeOpacity={0.2}
+        duration={60 * 1000}
+        onAnimationComplete={() => {
+          Alert.alert("Done");
+        }}
+      /> */}

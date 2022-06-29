@@ -10,6 +10,7 @@ import MailScreen from "../Screens/Drawer/MailScreen";
 import Main from "../Screens/Drawer/Main";
 import Approval from "../Screens/Drawer/Approval";
 import TaskWork from "../Screens/AuthScreen/TaskWork";
+import { AgendaEntry } from "react-native-calendars";
 
 export type HomeDrawerParamsList = {
   Main: undefined;
@@ -24,7 +25,7 @@ export type RootStackParamList = {
   CheckInScreen: undefined;
   MailScreen: undefined;
   TaskWork:{
-    task:string
+    task:AgendaEntry
   }
  
 };

@@ -18,15 +18,31 @@ export type Post = {
   title: string;
   body: string;
 };
+const timeToString = (time: number) => {
+  const date = new Date(time);
+  return date.toISOString().split("T")[0];
+};
 
-
+const isWeekend = (date = new Date()) => {
+  return date.getDay() === 6 || date.getDay() === 0;
+};
 
 const AgendaScreen = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [items, setItem] = React.useState<AgendaSchedule>({
     "28/06/2022": [
-      { day: "28/06/2022", height: 40, name: "Task1" },
-      { day: "28/05/2022", height: 40, name: "Task2" },
+      {
+        day: "28/06/2022",
+        height: 40,
+        name: "Task1",
+        hour: "10:00 AM - 10:45 AM",
+      },
+      {
+        day: "28/05/2022",
+        height: 40,
+        name: "Task2",
+        hour: "10:00 AM - 10:45 AM",
+      },
     ],
   });
 
@@ -36,24 +52,14 @@ const AgendaScreen = () => {
         "https://my-json-server.typicode.com/vanhieuu/fakeData/post"
       );
       const data: AgendaSchedule[] = await response.json();
-      const mappedData = Object.assign({},...data)
-      setItem(mappedData)
-      
+      const mappedData = Object.assign({}, ...data);
+      setItem(mappedData);
     };
 
     getData();
   }, []);
 
-  
 
-  const timeToString = (time: number) => {
-    const date = new Date(time);
-    return date.toISOString().split("T")[0];
-  };
-
-  const isWeekend = (date = new Date()) => {
-    return date.getDay() === 6 || date.getDay() === 0;
-  };
 
   const loadItems = (day: DateData) => {
     const item = items || {};
@@ -69,14 +75,16 @@ const AgendaScreen = () => {
             item[strTime].push({
               name: `Task${i}`,
               day: dayjs(strTime).format("DD/MM/YYYY"),
-              height: 40,
+              height: 60,
+              hour: dayjs(strTime).format("HH:mm"),
             });
           }
           if (isWeekend(new Date(strTime)) === true) {
             item[strTime].push({
               name: "Ngày nghỉ",
               day: dayjs(strTime).format("DD/MM/YYYY"),
-              height: 40,
+              height: 20,
+              hour: "",
             });
           }
         }
@@ -90,30 +98,33 @@ const AgendaScreen = () => {
   };
 
   const renderItem = (item: AgendaEntry) => {
-    
     return (
       <TouchableOpacity
         style={{
           marginTop: 17,
           marginRight: 10,
           backgroundColor:
-            isWeekend(new Date(dayjs(item.day).format('DD/MM/YYYY'))) === false
-              ? theme.COLORS.SUCCESS
+            isWeekend(new Date(dayjs(item.day).format("DD/MM/YYYY"))) === false
+              ? theme.COLORS.COEDU
               : theme.COLORS.BLOCK,
           flex: 1,
           borderRadius: 10,
-          
         }}
         onPress={() => {
-          navigation.navigate('TaskWork',{
-            task:item.name
-          })
-          
+          navigation.navigate("TaskWork", {
+            task: item,
+          });
         }}
-        disabled={isWeekend(new Date(dayjs(item.day).format('DD/MM/YYYY'))) === true ? true:false}
+        disabled={
+          isWeekend(new Date(dayjs(item.day).format("DD/MM/YYYY"))) === true
+            ? true
+            : false
+        }
       >
         <View style={styles.labelContainer}>
+          <Text style={styles.textHour}>{item.hour}</Text>
           <Text style={styles.textLabel}>{item.name}</Text>
+
         </View>
       </TouchableOpacity>
     );
@@ -183,11 +194,22 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 8,
   },
+  textHour: {
+    fontSize: 20,
+    color: "black",
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+    padding: 8,
+    fontWeight:'bold'
+  },
   labelContainer: {
-    flexDirection: "row",
+    // flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 5,
+    flexWrap:'wrap'
   },
   modalView: {
     backgroundColor: theme.COLORS.WARNING,
