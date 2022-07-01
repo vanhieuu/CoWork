@@ -1,9 +1,8 @@
-const capitalize = (input: string) => {
-  `${input.charAt(0).toUpperCase()}${input.slice(1)}`;
-};
-const capitalizeKey = (input:string) =>{
-  input
-    .split(/(?=[A-Z])/)
-    .map((word) => capitalize(word))
-    .join(" ");
+export const formatDate = (date:string) =>{
+      new Date(date).toLocaleString('en-GB', {
+        month:'long',
+        weekday: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      })
 }

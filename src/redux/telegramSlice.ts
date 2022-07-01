@@ -20,6 +20,7 @@ const initialState: TelegramBotResponse = {
           is_bot: false,
           language_code: "en",
           last_name: "Hiếu",
+          username:'Văn Hiếu'
         },
         message_id: 7,
         text: "hello from the another side",

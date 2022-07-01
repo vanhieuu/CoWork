@@ -4,8 +4,11 @@ import {
   makePostRequest,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_USER_ID,
+  getUserInfo
 } from "./apiTelegram";
 import { sendNotification } from "./telegram";
+import handler from "./share";
+
 export {
   theme,
   Role,
@@ -14,4 +17,6 @@ export {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_USER_ID,
   sendNotification,
+  handler,
+  getUserInfo
 };

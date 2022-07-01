@@ -2,7 +2,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 import { Role, theme } from "../constants";
-import SideBar from "../components/SideBar";
+import { SideBar } from "../components";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 
 const Menu = ({ navigation, state }: DrawerContentComponentProps) => {

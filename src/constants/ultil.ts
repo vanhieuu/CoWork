@@ -1,6 +1,6 @@
 import { Platform, StatusBar } from "react-native";
 import theme from "./theme";
-
+import * as ImagePicker from "expo-image-picker";
 export const StatusBarHeight = StatusBar.currentHeight;
 export const HeaderHeight = theme.SIZES.BASE * 3.5 + (StatusBarHeight || 0);
 export const iphoneX = ({ height, width }: { height: number; width: number }) =>
@@ -51,6 +51,7 @@ export type ResultTelegramResponse = {
       last_name: string;
       language_code: string;
       is_bot: boolean;
+      username: string;
     };
     message_id: number;
     text: string;
@@ -60,5 +61,65 @@ export type ResultTelegramResponse = {
 
 export type TelegramBotResponse = {
   ok: boolean;
-  result: ResultTelegramResponse[] ;  
+  result: ResultTelegramResponse[] ;
+};
+export interface TaskProps {
+  id: number;
+  task: string;
+  isComplete: boolean;
+  date: string;
+  hour: string;
+  endTime: string;
+  output: string | undefined;
+}
+
+export interface ImagePickerProps extends ImagePicker.ImageInfo {
+  cancelled: boolean;
+  height: number;
+  type: "image" | "video" | undefined;
+  uri: string;
+  width: number;
+  id: number | undefined;
+}
+export type DataResponseBotUpdate = {
+  message: {
+    chat: {
+      id: number;
+      title: string;
+      type: string;
+    };
+    date: number;
+    from: {
+      first_name: string;
+      id: number;
+      last_name: string;
+      language_code: string;
+      is_bot: boolean;
+      username: string;
+    };
+    message_id: number;
+    new_chat_member: {
+      first_name: string;
+      id: number;
+      last_name: string;
+      language_code: string;
+      is_bot: boolean;
+      username: string;
+    };
+    new_chat_members: {
+      first_name: string;
+      id: number;
+      is_bot: boolean;
+      username: string;
+    }[];
+    new_chat_participant: {
+      first_name: string;
+      id: number;
+      last_name: string;
+      language_code: string;
+      is_bot: boolean;
+      username: string;
+    };
+  };
+  update_id: number;
 };
