@@ -8,9 +8,12 @@ import {
   AgendaEntry,
   AgendaSchedule,
 } from "react-native-calendars";
+import { useDispatch, useSelector } from "react-redux";
 
 import { theme } from "../constants";
 import { RootStackParamList } from "../navigation/RootStack";
+import { RootState } from "../redux/store";
+import { DateProps,  onAddTask, TaskAuth, } from "../redux/taskSlice";
 
 export type Post = {
   userId: number;
@@ -29,6 +32,9 @@ const isWeekend = (date = new Date()) => {
 
 const AgendaScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const dispatch = useDispatch();
+  const dayTask = useSelector<RootState, TaskAuth>((state) => state.task.days);
+
   const [items, setItem] = React.useState<AgendaSchedule>({
     "28/06/2022": [
       {
@@ -54,13 +60,14 @@ const AgendaScreen = () => {
       const data: AgendaSchedule[] = await response.json();
       const mappedData = Object.assign({}, ...data);
       setItem(mappedData);
+      dispatch(onAddTask({ days:mappedData }));
     };
 
     getData();
   }, []);
-
-
-
+  //Get date as key object dayTask 
+  console.log(Object.keys(dayTask).find(item => item === dayjs(new Date()).format('YYYY-MM-DD')),'date')
+  
   const loadItems = (day: DateData) => {
     const item = items || {};
 
@@ -72,7 +79,7 @@ const AgendaScreen = () => {
         if (!item[strTime]) {
           item[strTime] = [];
           if (strTime === dayjs(new Date()).format("YYYY-MM-DD")) {
-            item[strTime].push({
+            item[strTime]?.push({
               name: `Task${i}`,
               day: dayjs(strTime).format("DD/MM/YYYY"),
               height: 60,
@@ -80,7 +87,7 @@ const AgendaScreen = () => {
             });
           }
           if (isWeekend(new Date(strTime)) === true) {
-            item[strTime].push({
+            item[strTime]?.push({
               name: "Ngày nghỉ",
               day: dayjs(strTime).format("DD/MM/YYYY"),
               height: 20,
@@ -124,7 +131,6 @@ const AgendaScreen = () => {
         <View style={styles.labelContainer}>
           <Text style={styles.textHour}>{item.hour}</Text>
           <Text style={styles.textLabel}>{item.name}</Text>
-
         </View>
       </TouchableOpacity>
     );
@@ -137,9 +143,11 @@ const AgendaScreen = () => {
         onPress={() => console.log(data.toISOString().split("T")[0])}
       >
         <View>
+          
           <Text style={styles.textLabel}>
             {" "}
             Chưa có task{" "}
+           
             {dayjs(data.toISOString().split("T")[0]).format("DD/MM/YYYY")}{" "}
           </Text>
         </View>
@@ -202,14 +210,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
     padding: 8,
-    fontWeight:'bold'
+    fontWeight: "bold",
   },
   labelContainer: {
     // flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 5,
-    flexWrap:'wrap'
+    flexWrap: "wrap",
   },
   modalView: {
     backgroundColor: theme.COLORS.WARNING,

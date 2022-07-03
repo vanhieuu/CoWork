@@ -1,4 +1,6 @@
 import {
+  ActivityIndicator,
+  Alert,
   Modal,
   Pressable,
   StyleSheet,
@@ -9,7 +11,7 @@ import {
 import React from "react";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/RootStack";
-import { theme } from "../../constants";
+import { app, theme } from "../../constants";
 import { CoIcon, CoInput } from "../../components";
 import { StatusBar } from "expo-status-bar";
 import dayjs from "dayjs";
@@ -24,31 +26,48 @@ import {
   TaskProps,
   TelegramBotResponse,
 } from "../../constants/ultil";
+import { getDatabase, onValue } from "firebase/database";
+import * as firebase from "firebase/app";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  updateMetadata,
+  uploadBytes,
+} from "firebase/storage";
+import "firebase/storage";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { TaskAuth } from "../../redux/taskSlice";
 const userId = 1019637578;
+
 const TaskWork = () => {
   const route = useRoute<RouteProp<RootStackParamList, "TaskWork">>();
   const params = route.params;
+  const stateRedux = useSelector<RootState,TaskAuth>(state=>state.task.days)
   const [show, setShow] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [tasks, setTasks] = React.useState<TaskProps[]>([]);
   const [textInput, setTextInput] = React.useState("Thêm task");
   const [showMore, setShowMore] = React.useState<boolean>(false);
+  const [resImage, setResImage] = React.useState("");
   const [dataResponse, setDataRes] = React.useState<TelegramBotResponse>();
-  const imagePicker = React.useRef<ImagePicker.ImagePickerResult>({
-    cancelled: false,
-    height: 1280,
-    type: "image",
-    uri: "",
-    width: 960,
-  });
+
   const [image, setImage] = React.useState<ImagePickerProps[]>([]);
   React.useEffect(() => {
-    getUserInfo().then((data: TelegramBotResponse) => setDataRes(data));
-
+    const getData = async() =>{
+     await getUserInfo().then((data: TelegramBotResponse) => {setDataRes(data),console.log(data.result,'data')});
+    
+    }
+    getData()
+    
     return () => {};
   }, []);
+ 
+ 
 
   const openImagePickerAsync = async (id: number) => {
+    console.log("Run Open Image Picker");
     let permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -62,98 +81,136 @@ const TaskWork = () => {
     });
 
     if (!pickerResult.cancelled) {
-      console.log(pickerResult.cancelled);
+      console.log(pickerResult.cancelled, "pickerResult cancelled");
+      
     }
     if (pickerResult.cancelled === false) {
-      imagePicker.current = pickerResult;
-      const newImage: ImagePickerProps = {
-        cancelled: pickerResult.cancelled,
-        height: pickerResult.height,
-        type: pickerResult.type,
-        uri: pickerResult.uri,
-        width: pickerResult.width,
-        id: tasks.find((item) => item.id === id)?.id,
-      };
-      setImage([...image, newImage]);
-    }
-    sendPhoto(id);
-  };
-  const onPressCheck = (id: number) => {
-    const newTasks = tasks.map((item) => {
-      if (item.id === id) {
-        return {
-          ...item,
-          isComplete: true,
-          endTime: dayjs(new Date()).format("HH:mm"),
-          output: "",
+      const blob: Blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
         };
-      }
-      return item;
-    });
-    setTasks(newTasks);
-    openImagePickerAsync(id);
-  };
-
-  const sendPhoto = React.useCallback(
-    async (id: number) => {
-      setLoading(true);
-
-      const objectTask = {
-        Task: tasks.find((item) => item.id === id)!.task,
-        "Thời gian bắt đầu": tasks.find((item) => item.id)?.hour,
-        "Thời gian kết thúc": tasks.find((item) => item.id)!.endTime,
-        Ngày: tasks.find((item) => item.id)?.date,
-        "Người thực hiện": `[@${
-          dataResponse?.result.find((item) => item.message.from.id === userId)
-            ?.message.from.username
-        }](tg://user?id=${
-          dataResponse?.result.find((item) => item.message.from.id === userId)
-            ?.message.from.id
-        })`,
-      };
-
-      // const taskDone = toEscapeMSg(JSON.stringify(objectTask));
-      const taskDone = Object.entries(objectTask)
-        .map((x) => x.join(": "))
-        .join("\r\n");
-
-      const formData = new FormData();
-
-      formData.append("chat_id", TELEGRAM_USER_ID);
-      formData.append(
-        "photo",
-        "https://assets.materialup.com/uploads/ae7c97e1-5627-4ff1-98fa-894821fada17/preview.jpg"
+        xhr.onerror = function (e) {
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", pickerResult.uri, true);
+        xhr.send(null);
+      });
+      const metadata = { contentType: "image/jpg" };
+      const firebaseStore = getStorage(app, "cowork-7a15a.appspot.com");
+      const reference = ref(
+        firebaseStore,
+        pickerResult.uri.substring(pickerResult.uri.lastIndexOf("/") + 1)
       );
-      formData.append("file_id", tasks.find((item) => item.id === id)!.task);
-      formData.append("caption", taskDone);
-      formData.append("parse_mode", "Markdown");
 
-      await fetch(URL.sendPhoto(formData), {
-        method: "POST",
-        headers: {
-          Accept: "multipart/form-data",
-          "Content-type": "multipart/form-data",
+      await uploadBytes(reference, blob, metadata).then(
+        (res) => {
+          setLoading(true);
+          getDownloadURL(res.ref)
+            .then((url) => {
+              pickerResult.uri = url;
+              setResImage(url);
+            })
+            .then(() => {
+              setLoading(true);
+              const newImage: ImagePickerProps = {
+                uri: pickerResult.uri,
+                id: tasks.find((item) => item.id === id)?.id,
+              };
+
+              setImage([...image, newImage]);
+              const newTasks = tasks.map((item) => {
+                if (item.id === id) {
+                  return {
+                    ...item,
+                    isComplete: true,
+                    endTime: dayjs(new Date()).format("HH:mm"),
+                    output: pickerResult.uri,
+                  };
+                }
+                return item;
+              });
+              setTasks(newTasks);
+              console.log(newTasks,'pickerResult');
+              
+              setLoading(false);
+            });
         },
-        body: formData,
-      })
-        .then((res) => res.json())
-        .then((json: TelegramBotResponse) => console.log(json.ok, "json"));
-      setLoading(false);
-    },
-    [onPressCheck, loading]
-  );
+        (err) => {
+          console.error(err);
+        }
+      );
+    }
+  };
+ 
+  const sendPhoto = async (id: number) => {
+    if (loading === true) return null;
+    setLoading(true);
+    const objectTask = {
+      Task: tasks.find((item) => item.id === id)!.task,
+      "Thời gian bắt đầu": tasks.find((item) => item.id === id)?.hour,
+      "Thời gian kết thúc": tasks.find((item) => item.id===id)?.endTime,
+      Ngày: tasks.find((item) => item.id === id)?.date,
+      "Người thực hiện": `[@${
+        dataResponse?.result.find((item) => item.message.from.id === userId)
+          ?.message.from.username
+      }](tg://user?id=${
+        dataResponse?.result.find((item) => item.message.from.id === userId)
+          ?.message.from.id
+      })`,
+    };
+    
+   
+    // const taskDone = toEscapeMSg(JSON.stringify(objectTask));
+
+    const taskDone = Object.entries(objectTask)
+      .map((x) => x.join(": "))
+      .join("\r\n");
+    
+    const formData = new FormData();
+
+    formData.append("chat_id", TELEGRAM_USER_ID);
+    formData.append("photo", image.find((item) => item.id === id)!.uri);
+    formData.append("file_id", tasks.find((item) => item.id === id)!.task);
+    formData.append("caption", taskDone);
+    formData.append("parse_mode", "Markdown");
+
+    await fetch(URL.sendPhoto(formData), {
+      method: "POST",
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-type": "multipart/form-data",
+      },
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((json: TelegramBotResponse) => {
+        if(json.ok === false){
+          Alert.alert('Không thành công')
+        }else{
+          Alert.alert('Thành công')
+          
+        }
+       
+        setLoading(false);
+      });
+  };
 
   const addTask = () => {
+    
     const newTask: TaskProps = {
       id: Math.floor(Math.random() * 100),
       task: textInput,
       isComplete: false,
       date: params.task.day,
-      hour: dayjs(new Date()).format("HH:mm"),
+      hour: dayjs(new Date().getTime() ).format("HH:mm"),
       endTime: "",
       output: "",
     };
     setTasks([...tasks, newTask]);
+    console.log(newTask,'new Task for add Task')
+    
     setShow(!show);
   };
 
@@ -262,9 +319,8 @@ const TaskWork = () => {
                       },
                     ]}
                     onPress={() => {
-                      onPressCheck(item.id);
+                      openImagePickerAsync(item.id)
                       setShowMore(true);
-
                       // testSendMessage(item.id);
                     }}
                   >
@@ -274,6 +330,33 @@ const TaskWork = () => {
                       size={20}
                       color={theme.COLORS.BLACK}
                     />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.iconCheck,
+                      {
+                        backgroundColor: theme.COLORS.ACTIVE,
+                      },
+                    ]}
+                    onPress={() => {
+                      sendPhoto(item.id);
+                      // testSendMessage(item.id);
+                    }}
+                    disabled={loading === true ? true : false}
+                  >
+                    {loading === true ? (
+                      <ActivityIndicator
+                        size={"large"}
+                        color={theme.COLORS.SUCCESS}
+                      />
+                    ) : (
+                      <CoIcon
+                        name="publish"
+                        family="Entypo"
+                        size={20}
+                        color={theme.COLORS.ICON}
+                      />
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>

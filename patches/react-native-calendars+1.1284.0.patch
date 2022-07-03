@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-calendars/src/types.d.ts b/node_modules/react-native-calendars/src/types.d.ts
+index 9038871..31092b3 100644
+--- a/node_modules/react-native-calendars/src/types.d.ts
++++ b/node_modules/react-native-calendars/src/types.d.ts
+@@ -106,6 +106,7 @@ export declare type AgendaEntry = {
+     name: string;
+     height: number;
+     day: string;
++    hour:string
+ };
+ export declare type AgendaSchedule = {
+     [date: string]: AgendaEntry[];

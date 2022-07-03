@@ -70,15 +70,14 @@ export interface TaskProps {
   date: string;
   hour: string;
   endTime: string;
-  output: string | undefined;
+  output: string  | Blob;
 }
 
-export interface ImagePickerProps extends ImagePicker.ImageInfo {
-  cancelled: boolean;
-  height: number;
-  type: "image" | "video" | undefined;
+export interface ImagePickerProps  {
+  
+ 
   uri: string;
-  width: number;
+ 
   id: number | undefined;
 }
 export type DataResponseBotUpdate = {

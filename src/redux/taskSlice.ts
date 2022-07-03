@@ -1,27 +1,41 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AgendaEntry, AgendaSchedule } from "react-native-calendars";
 
-export interface TaskAuth {
-  day: AgendaEntry[];
+
+export interface DateProps {
+     name:string,
+      height:number,
+      hour:string,
+      day:string
 }
 
-const initState: AgendaSchedule = {
-  day: [
-    {
-      name: "",
-      day: "",
-      height: 0,
-      hour:''
-    },
-  ],
+export interface TaskAuth {
+    [date:string]:DateProps[]
+}
+
+export interface InitState  {
+  days:TaskAuth
+}
+
+const initState: InitState = {
+  days:{  
+    "date":[
+      {
+        name:'',
+        hour:'',
+        height:0,
+        day:''
+      }
+    ]
+  }
 };
 
 export const taskSlice = createSlice({
   name: "task",
   initialState: initState,
   reducers: {
-    onAddTask: (state, action: PayloadAction<TaskAuth>) => {
-      state.day = action.payload.day;
+    onAddTask: (state, action: PayloadAction<InitState>) => {
+      state.days = action.payload.days;
      
     },
   },
