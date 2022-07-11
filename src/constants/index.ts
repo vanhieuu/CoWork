@@ -8,7 +8,7 @@ import {
 } from "./apiTelegram";
 import { sendNotification } from "./telegram";
 import handler from "./share";
-import { app,storage } from "./firebase";
+import { app,storage ,firebaseAuth} from "./firebase";
 
 export {
   theme,
@@ -21,6 +21,8 @@ export {
   handler,
   getUserInfo,
   app,
+  firebaseAuth,
+ 
   
   storage
 };

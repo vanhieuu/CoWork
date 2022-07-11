@@ -39,10 +39,9 @@ export const testId = {
 export type ResultTelegramResponse = {
   message: {
     chat: {
-      first_name: string;
       id: number;
-      last_name: string;
-      type: "private" | "public";
+      title: string;
+      type: string;
     };
     date: number;
     from: {
@@ -54,14 +53,30 @@ export type ResultTelegramResponse = {
       username: string;
     };
     message_id: number;
-    text: string;
+    new_chat_member: {
+      first_name: string;
+      id: number;
+      last_name: string;
+      language_code: string;
+      is_bot: boolean;
+      username: string;
+    };
+    new_chat_members: NewChatMemberProps[];
+    new_chat_participant: {
+      first_name: string;
+      id: number;
+      last_name: string;
+      language_code: string;
+      is_bot: boolean;
+      username: string;
+    };
   };
   update_id: number;
 };
 
 export type TelegramBotResponse = {
   ok: boolean;
-  result: ResultTelegramResponse[] ;
+  result: ResultTelegramResponse[];
 };
 export interface TaskProps {
   id: number;
@@ -70,16 +85,21 @@ export interface TaskProps {
   date: string;
   hour: string;
   endTime: string;
-  output: string  | Blob;
+  output: string | Blob;
 }
 
-export interface ImagePickerProps  {
-  
- 
+export interface ImagePickerProps {
   uri: string;
- 
   id: number | undefined;
 }
+
+export interface NewChatMemberProps {
+  first_name: string;
+  id: number;
+  is_bot: boolean;
+  username: string;
+}
+
 export type DataResponseBotUpdate = {
   message: {
     chat: {
@@ -105,12 +125,7 @@ export type DataResponseBotUpdate = {
       is_bot: boolean;
       username: string;
     };
-    new_chat_members: {
-      first_name: string;
-      id: number;
-      is_bot: boolean;
-      username: string;
-    }[];
+    new_chat_members: NewChatMemberProps[];
     new_chat_participant: {
       first_name: string;
       id: number;

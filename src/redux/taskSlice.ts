@@ -9,13 +9,15 @@ export interface DateProps {
       day:string
 }
 
-export interface TaskAuth {
+export interface  TaskAuth {
     [date:string]:DateProps[]
 }
 
 export interface InitState  {
   days:TaskAuth
 }
+
+
 
 const initState: InitState = {
   days:{  

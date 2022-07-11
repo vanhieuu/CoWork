@@ -57,7 +57,7 @@ const CoInput = ({
   );
 };
 
-export default CoInput;
+export default React.memo(CoInput);
 
 const styles = StyleSheet.create({
   input: {

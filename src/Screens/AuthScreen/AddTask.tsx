@@ -26,7 +26,7 @@ const AddTask = () => {
       .then((json) => {
         setResponse(json);
         dispatch(onGetInfo(json));
-        console.log(json);
+        
       });
   };
  

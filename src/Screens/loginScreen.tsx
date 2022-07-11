@@ -1,16 +1,53 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Alert, Image, StyleSheet, View } from "react-native";
 import React from "react";
 import { CoButton, CoInput } from "../components";
-import { theme } from "../constants";
+import { firebaseAuth, theme } from "../constants";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/RootStack";
+import * as firebase from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { IUser, IUserCredential, onLogin } from "../redux/authSlice";
 
 const LoginScreen = () => {
   const [userInfo, setUserInfo] = React.useState({
-    userName: "",
+    email: "",
     password: "",
   });
+  const dispatch= useDispatch()
+
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
+
+  React.useEffect(() => {
+    const unSubscribe = firebaseAuth.beforeAuthStateChanged((user) => {
+      if (user) {
+        navigate("Home");
+      }
+    });
+
+    return unSubscribe;
+  }, []);
+
+  const onPressLogin = React.useCallback(async () => {
+    console.log('aaaa')
+    if (userInfo.email === "") {
+      Alert.alert("Không được để trống");
+      return;
+    }
+    await firebase
+      .signInWithEmailAndPassword(
+        firebaseAuth,
+        userInfo.email,
+        userInfo.password
+      )
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log("login with email and password", user);
+        
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [userInfo]);
 
   return (
     <View style={styles.container}>
@@ -42,13 +79,13 @@ const LoginScreen = () => {
           error={false}
           placeHolder={"ID or User Name"}
           name={"user"}
-          onChangeText={(userName: string) =>
+          onChangeText={(email: string) =>
             setUserInfo((prev) => ({
               ...prev,
-              userName: userName,
+              email: email,
             }))
           }
-          value={userInfo.userName}
+          value={userInfo.email}
           style={{}}
         />
       </View>
@@ -74,9 +111,7 @@ const LoginScreen = () => {
         <CoButton
           buttonStyle={styles.buttonStyle}
           textStyle={styles.textButton}
-          onPress={() => {
-            navigate("Home");
-          }}
+          onPress={onPressLogin}
           title={"Login"}
         />
       </View>

@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import task from './taskSlice'
 import tele from './telegramSlice'
+import auth from './authSlice'
 const store = configureStore({
     reducer:{
         task,
-        tele
+        tele,
+        auth
     }
 })
 export default store

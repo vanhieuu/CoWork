@@ -13,6 +13,7 @@ const CalendarScreen = () => {
   const [selected, setSelected] = useState(INITIAL_DATE);
   const [dt, setDt] = React.useState(new Date().toISOString().split("T")[0]);
   const labelRef = React.useRef("Chấm công ");
+  const [disable, setDisable] = React.useState<boolean>(true);
 
   const currentIpAddress = React.useRef<string>();
 
@@ -46,6 +47,12 @@ const CalendarScreen = () => {
   const onPressCheckIn = React.useCallback(() => {
     if (labelRef.current === "Chấm công") {
       labelRef.current = "Kết thúc ca";
+      if (
+        labelRef.current === "Kết thúc ca" &&
+        dayjs(new Date()).format("HH:mm") > "24"
+      ) {
+        setDisable(true);
+      }
     } else {
       labelRef.current = "Chấm công";
     }
@@ -170,7 +177,11 @@ const CalendarScreen = () => {
                   justifyContent: "center",
                 }}
                 disabled={
-                  currentIpAddress.current != INITIAL_IP_ADDRESS ? true : false
+                  currentIpAddress.current != INITIAL_IP_ADDRESS
+                    ? true
+                    : false || disable === true
+                    ? true 
+                    : false
                 }
                 onPress={onPressCheckIn}
               >

@@ -66,10 +66,11 @@ const AgendaScreen = () => {
     getData();
   }, []);
   //Get date as key object dayTask 
-  console.log(Object.keys(dayTask).find(item => item === dayjs(new Date()).format('YYYY-MM-DD')),'date')
+ 
+  
   
   const loadItems = (day: DateData) => {
-    const item = items || {};
+    const item = items || dayTask || {};
 
     setTimeout(() => {
       for (let i = -3; i < 3; i++) {
@@ -90,7 +91,7 @@ const AgendaScreen = () => {
             item[strTime]?.push({
               name: "Ngày nghỉ",
               day: dayjs(strTime).format("DD/MM/YYYY"),
-              height: 20,
+              height: 10,
               hour: "",
             });
           }
@@ -100,6 +101,7 @@ const AgendaScreen = () => {
       Object.keys(items).forEach((key) => {
         newItems[key] = item[key];
       });
+    
       setItem(newItems);
     }, 1000);
   };
@@ -162,7 +164,7 @@ const AgendaScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <Agenda
-        items={items}
+        items={items || dayTask}
         selected={new Date().toISOString()}
         renderItem={renderItem}
         renderEmptyDate={renderEmptyDate}

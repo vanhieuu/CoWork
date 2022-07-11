@@ -39,35 +39,35 @@ import "firebase/storage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { TaskAuth } from "../../redux/taskSlice";
-const userId = 1019637578;
+const userId = 5231804117;
 
 const TaskWork = () => {
   const route = useRoute<RouteProp<RootStackParamList, "TaskWork">>();
   const params = route.params;
-  const stateRedux = useSelector<RootState,TaskAuth>(state=>state.task.days)
+  const stateRedux = useSelector<RootState, TaskAuth>(
+    (state) => state.task.days
+  );
   const [show, setShow] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [tasks, setTasks] = React.useState<TaskProps[]>([]);
   const [textInput, setTextInput] = React.useState("Thêm task");
-  const [showMore, setShowMore] = React.useState<boolean>(false);
+  const [showMore, setShowMore] = React.useState<boolean>(true);
   const [resImage, setResImage] = React.useState("");
   const [dataResponse, setDataRes] = React.useState<TelegramBotResponse>();
 
   const [image, setImage] = React.useState<ImagePickerProps[]>([]);
   React.useEffect(() => {
-    const getData = async() =>{
-     await getUserInfo().then((data: TelegramBotResponse) => {setDataRes(data),console.log(data.result,'data')});
-    
-    }
-    getData()
-    
+    const getData = async () => {
+      await getUserInfo().then((data: TelegramBotResponse) => {
+        setDataRes(data);
+      });
+    };
+    getData();
+
     return () => {};
   }, []);
- 
- 
 
   const openImagePickerAsync = async (id: number) => {
-    console.log("Run Open Image Picker");
     let permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -82,7 +82,6 @@ const TaskWork = () => {
 
     if (!pickerResult.cancelled) {
       console.log(pickerResult.cancelled, "pickerResult cancelled");
-      
     }
     if (pickerResult.cancelled === false) {
       const blob: Blob = await new Promise((resolve, reject) => {
@@ -96,7 +95,9 @@ const TaskWork = () => {
         xhr.responseType = "blob";
         xhr.open("GET", pickerResult.uri, true);
         xhr.send(null);
+        
       });
+      
       const metadata = { contentType: "image/jpg" };
       const firebaseStore = getStorage(app, "cowork-7a15a.appspot.com");
       const reference = ref(
@@ -132,8 +133,8 @@ const TaskWork = () => {
                 return item;
               });
               setTasks(newTasks);
-              console.log(newTasks,'pickerResult');
-              
+              console.log(newTasks, "pickerResult");
+
               setLoading(false);
             });
         },
@@ -143,31 +144,33 @@ const TaskWork = () => {
       );
     }
   };
- 
+
   const sendPhoto = async (id: number) => {
     if (loading === true) return null;
     setLoading(true);
     const objectTask = {
       Task: tasks.find((item) => item.id === id)!.task,
       "Thời gian bắt đầu": tasks.find((item) => item.id === id)?.hour,
-      "Thời gian kết thúc": tasks.find((item) => item.id===id)?.endTime,
+      "Thời gian kết thúc": tasks.find((item) => item.id === id)?.endTime,
       Ngày: tasks.find((item) => item.id === id)?.date,
       "Người thực hiện": `[@${
         dataResponse?.result.find((item) => item.message.from.id === userId)
-          ?.message.from.username
-      }](tg://user?id=${
+          ?.message.from.first_name
+      } ${
+        dataResponse?.result.find((item) => item.message.from.id === userId)
+          ?.message.from.last_name
+      }    ](tg://user?id=${
         dataResponse?.result.find((item) => item.message.from.id === userId)
           ?.message.from.id
       })`,
     };
-    
-   
-    // const taskDone = toEscapeMSg(JSON.stringify(objectTask));
+
+
 
     const taskDone = Object.entries(objectTask)
       .map((x) => x.join(": "))
       .join("\r\n");
-    
+
     const formData = new FormData();
 
     formData.append("chat_id", TELEGRAM_USER_ID);
@@ -186,31 +189,29 @@ const TaskWork = () => {
     })
       .then((res) => res.json())
       .then((json: TelegramBotResponse) => {
-        if(json.ok === false){
-          Alert.alert('Không thành công')
-        }else{
-          Alert.alert('Thành công')
-          
+        if (json.ok === false) {
+          Alert.alert("Không thành công");
+        } else {
+          Alert.alert("Thành công");
         }
-       
+
         setLoading(false);
       });
   };
 
   const addTask = () => {
-    
     const newTask: TaskProps = {
       id: Math.floor(Math.random() * 100),
       task: textInput,
       isComplete: false,
       date: params.task.day,
-      hour: dayjs(new Date().getTime() ).format("HH:mm"),
+      hour: dayjs(new Date().getTime()).format("HH:mm"),
       endTime: "",
       output: "",
     };
     setTasks([...tasks, newTask]);
-    console.log(newTask,'new Task for add Task')
-    
+    console.log(newTask, "new Task for add Task");
+
     setShow(!show);
   };
 
@@ -319,7 +320,7 @@ const TaskWork = () => {
                       },
                     ]}
                     onPress={() => {
-                      openImagePickerAsync(item.id)
+                      openImagePickerAsync(item.id);
                       setShowMore(true);
                       // testSendMessage(item.id);
                     }}
@@ -340,7 +341,7 @@ const TaskWork = () => {
                     ]}
                     onPress={() => {
                       sendPhoto(item.id);
-                      // testSendMessage(item.id);
+                      
                     }}
                     disabled={loading === true ? true : false}
                   >
@@ -386,8 +387,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "80%",
     marginHorizontal: 40,
-    // backgroundColor: "blue",
-    // flex:1
+
   },
   containerTextAdd: {
     fontSize: 16,
@@ -402,9 +402,7 @@ const styles = StyleSheet.create({
   handleInput: {
     flexDirection: "row",
     alignItems: "center",
-    // width: "100%",
-    // flex:1,
-    // backgroundColor: "red",
+
   },
   taskList: {
     fontWeight: "bold",

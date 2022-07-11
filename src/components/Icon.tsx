@@ -77,6 +77,6 @@ const CoIcon = ({ name, family, size, color, ...rest }: IconProps) =>{
   );
 };
 
-export default CoIcon;
+export default React.memo(CoIcon);
 
 
