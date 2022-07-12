@@ -134,7 +134,7 @@ const Home = () => {
               <TouchableOpacity
           style={{
             marginRight: 16,
-            backgroundColor:'blue'
+            
           }}
           onPress={onSignOut}
         >
@@ -142,7 +142,7 @@ const Home = () => {
             name="logout"
             family="AntDesign"
             color={theme.COLORS.ACTIVE}
-            size={10}
+            size={20}
           />
         </TouchableOpacity>
             ) 

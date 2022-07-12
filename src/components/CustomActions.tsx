@@ -7,17 +7,16 @@ import {
   ViewStyle,
 } from "react-native";
 import React, { useContext } from "react";
-import PropTypes from "prop-types";
+
 import { GiftedChatContext } from "react-native-gifted-chat/lib/GiftedChatContext";
 import {
   getLocationAsync,
   pickImageAsync,
   takePictureAsync,
 } from "./medialUltils";
-import { IMessage } from "react-native-gifted-chat";
-import * as Location from 'expo-location'
+
 export interface ActionPressProps {
-  onSend: (messages: any) => void,
+  onSend: (images: { image: string; }[]) => void,
   wrapperStyle?: ViewStyle;
   iconTextStyle?: TextStyle;
   containerStyle?: ViewStyle;
@@ -54,7 +53,7 @@ const CustomActions = ({
             takePictureAsync(onSend);
             return;
           case 2:
-            getLocationAsync(onSend);
+            getLocationAsync();
             return;
           default:
             return;

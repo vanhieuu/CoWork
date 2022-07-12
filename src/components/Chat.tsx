@@ -1,4 +1,12 @@
-import { TouchableOpacity, Platform, Image, Text, View, Button } from "react-native";
+import {
+  TouchableOpacity,
+  Platform,
+  Image,
+  Text,
+  View,
+  Button,
+  Linking,
+} from "react-native";
 import React, {
   useState,
   useEffect,
@@ -21,46 +29,45 @@ import {
 } from "firebase/firestore";
 import { firebaseAuth, dataBase, theme } from "../constants";
 import { CoIcon, CustomActions } from ".";
-import { signOut } from "firebase/auth";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../navigation/RootStack";
-import { ActionPressProps } from "./CustomActions";
-import { LocationObjectCoords } from "expo-location";
-import dayjs from "dayjs";
+import AccessoryBar from "./AccessoryBar";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const Chat = () => {
   const [message, setMessage] = useState<IMessage[]>([]);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [user, setUser] = useState<User>();
-  const onSignOut = () => {
-    signOut(firebaseAuth).catch((err) => console.error(err));
-  };
-
-  useEffect(() => {
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const renderSend = (props: SendProps<IMessage>) => (
+    <Send {...props} containerStyle={{ justifyContent: "center" }}>
+      <CoIcon
+        size={30}
+        color={theme.COLORS.ICON}
+        name={"send"}
+        family={"MaterialIcons"}
+      />
+    </Send>
+  );
+  useLayoutEffect(() => {
     const collectionRef = collection(dataBase, "chats");
-    const currentUser = firebaseAuth.currentUser;
-    setUser({
-      _id: currentUser?.providerId,
-      name: currentUser!.displayName,
-    });
-    const q = query(collectionRef, orderBy("createdAt", "desc"));
+    const q = query(collectionRef, orderBy("createdAt"));
     const unSubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.docs) return null;
       setMessage(
         snapshot.docs.map((doc) => ({
-          _id: doc.id,
+          _id: doc.data()._id,
           createdAt: doc.data().createdAt.toDate(),
           text: doc.data().text,
-          //   image: doc.data().images,
+          image: doc.data().image,
           user: doc.data().user,
         }))
       );
-      return () => unSubscribe();
+      console.log(message, "mes snapshot");
     });
+    return unSubscribe;
   }, []);
 
   const onSend = useCallback((messages: IMessage[]) => {
     setMessage((prevMess: any) => GiftedChat.append(prevMess, message));
-
+    
     const { _id, createdAt, text, user, image } = messages[0];
     addDoc(collection(dataBase, "chats"), {
       _id,
@@ -71,46 +78,51 @@ const Chat = () => {
     });
   }, []);
 
-  const renderSend = (props: IMessage) => (
-    <Send containerStyle={{ justifyContent: "center" }}>
-      <CoIcon
-        size={30}
-        color={"tomato"}
-        name={"send"}
-        family={"MaterialIcons"}
-      />
-      <Text>{props.text}</Text>
-      <Image source={{ uri: props.image }} />
-    </Send>
+  // const renderCustomActions = () =>
+  //   Platform.OS === "web" ? null : <CustomActions onSend={onSendFromUser} />;
+
+  const onSendImage = (images: { image: string; }[]) =>{
+      setMessage((prev) =>({
+        ...prev,
+        images
+      }))
+      
+  }
+
+
+
+  const renderAccessory = () => (
+    <AccessoryBar onSend={onSendImage} isTyping={() => setIsTyping(!isTyping)} />
   );
 
-  const onSendFromUser = (messages: IMessage[]) => {
-    const createdAt = dayjs(new Date()).format("DD-MM-YYYY");
+  const onSendFromUser = (messages: IMessage[] = []) => {
+    const createdAt = new Date();
     const messagesToUpload = messages.map((message) => ({
       ...message,
-      user,
       createdAt,
       _id: Math.round(Math.random() * 1000000),
+      
     }));
-    setMessage((prev) => ({
-      ...prev,
-      messagesToUpload,
-    }));
+    onSend(messagesToUpload);
   };
 
-  const renderCustomActions = ({
-    onSend,
-    wrapperStyle,
-    iconTextStyle,
-    containerStyle,
-    ...props
-  }: ActionPressProps) =>
-    Platform.OS === "web" ? null : <CustomActions {...props} onSend={onSend} />;
+  const parsePatterns = (_linkStyle: any) => {
+    return [
+      {
+        pattern: /#(\w+)/,
+        style: { textDecorationLine: "underline", color: "darkorange" },
+        onPress: () => Linking.openURL("http://gifted.chat"),
+      },
+    ];
+  };
+
+
+
 
   return (
     <GiftedChat
       messages={message}
-    //   onSend={onSend}
+      onSend={onSend}
       user={{
         _id: firebaseAuth!.currentUser!.email,
         avatar: "",
@@ -118,24 +130,11 @@ const Chat = () => {
       messagesContainerStyle={{
         backgroundColor: "#fff",
       }}
-      renderActions={renderCustomActions}
-      renderSend={(item:IMessage) => {
-        {
-          console.log(item.text,'item');
-          console.log(item.image,'itemImage');
-        }
-        return (
-          <View style={{flex:1,justifyContent:'center'}}>
-            <Image source={{ uri: item.image }} style={{
-                width:100,
-                height:100,
-                backgroundColor:'red',
-                resizeMode:'center'
-            }} />
-           
-          </View>
-        );
-      }}
+      // renderActions={renderCustomActions}
+      alwaysShowSend={true}
+      renderSend={renderSend}
+      parsePatterns={parsePatterns}
+      renderAccessory={ renderAccessory}
     />
   );
 };
