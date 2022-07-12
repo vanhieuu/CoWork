@@ -5,4 +5,18 @@ import AgendaScreen from "./Agenda";
 import CalendarScreen from "./Calendar";
 import TouchableIcon from "./TouchableIcon";
 import SideBar from "./SideBar";
-export {CoIcon,CoInput,CoButton,AgendaScreen,CalendarScreen,TouchableIcon,SideBar}
+import CustomActions from "./CustomActions";
+import getPermissionAsync,{getLocationAsync,pickImageAsync} from "./medialUltils";
+export {
+  CoIcon,
+  CoInput,
+  CoButton,
+  AgendaScreen,
+  CalendarScreen,
+  TouchableIcon,
+  SideBar,
+  CustomActions,
+  getLocationAsync,
+  getPermissionAsync,
+  pickImageAsync
+};

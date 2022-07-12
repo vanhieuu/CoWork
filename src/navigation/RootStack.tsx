@@ -12,6 +12,10 @@ import Approval from "../Screens/Drawer/Approval";
 import TaskWork from "../Screens/AuthScreen/TaskWork";
 import { AgendaEntry } from "react-native-calendars";
 import AddTask from "../Screens/AuthScreen/AddTask";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { signOut } from "firebase/auth";
+import { firebaseAuth, theme } from "../constants";
+import { CoIcon } from "../components";
 
 export type HomeDrawerParamsList = {
   Main: undefined;
@@ -72,6 +76,10 @@ const RootStack = () => {
 };
 
 const Home = () => {
+  
+  const onSignOut = () => {
+    signOut(firebaseAuth).catch((err) => console.error(err));
+  };
   return (
     <Drawer.Navigator
       initialRouteName="Main"
@@ -119,7 +127,27 @@ const Home = () => {
         name="MailScreen"
         component={MailScreen}
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerTitle:'Chat',
+          headerRight(props){
+            return (
+              <TouchableOpacity
+          style={{
+            marginRight: 16,
+            backgroundColor:'blue'
+          }}
+          onPress={onSignOut}
+        >
+          <CoIcon
+            name="logout"
+            family="AntDesign"
+            color={theme.COLORS.ACTIVE}
+            size={10}
+          />
+        </TouchableOpacity>
+            ) 
+          }
+          
         }}
       />
        <Drawer.Screen

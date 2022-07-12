@@ -1,4 +1,10 @@
-import { Alert, Image, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 import React from "react";
 import { CoButton, CoInput } from "../components";
 import { firebaseAuth, theme } from "../constants";
@@ -13,7 +19,7 @@ const LoginScreen = () => {
     email: "",
     password: "",
   });
-  const dispatch= useDispatch()
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
 
@@ -27,8 +33,8 @@ const LoginScreen = () => {
     return unSubscribe;
   }, []);
 
-  const onPressLogin = React.useCallback(async () => {
-    console.log('aaaa')
+  const onHandleLogin = React.useCallback(async () => {
+    setLoading(true);
     if (userInfo.email === "") {
       Alert.alert("Không được để trống");
       return;
@@ -40,14 +46,33 @@ const LoginScreen = () => {
         userInfo.password
       )
       .then((userCredentials) => {
-        const user = userCredentials.user;
-        console.log("login with email and password", user);
-        
+        if (!userCredentials) {
+          Alert.alert("Đăng nhập không thành công");
+        } else {
+          const user = userCredentials.user;
+          user.providerData.forEach((profile) =>{
+            console.log("Sign-in provider: " + profile.providerId);
+            console.log("  Provider-specific UID: " + profile.uid);
+            console.log("  Name: " + profile.displayName);
+            console.log("  Email: " + profile.email);
+            console.log("  Photo URL: " + profile.photoURL);
+          })
+          
+          setLoading(false);
+        }
       })
       .catch((err) => {
         console.error(err);
       });
   }, [userInfo]);
+
+  {
+    loading && (
+      <View>
+        <ActivityIndicator size={"large"} color={theme.COLORS.GRADIENT_START} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -111,7 +136,7 @@ const LoginScreen = () => {
         <CoButton
           buttonStyle={styles.buttonStyle}
           textStyle={styles.textButton}
-          onPress={onPressLogin}
+          onPress={onHandleLogin}
           title={"Login"}
         />
       </View>
