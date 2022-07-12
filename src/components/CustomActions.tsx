@@ -33,10 +33,10 @@ const CustomActions = ({
   const context = useContext(GiftedChatContext);
   const onActionPress = () => {
     const options = [
-      "Choose From Library",
-      "Take Picture",
-      "Send Location",
-      "Cancel",
+      "Chọn từ thư viện",
+      "Chụp ảnh",
+      "Gửi vị trí",
+      "Huỷ",
     ];
     const cancelButtonIndex = options.length - 1;
     context.actionSheet().showActionSheetWithOptions(
