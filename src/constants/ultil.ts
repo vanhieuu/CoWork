@@ -1,6 +1,8 @@
 import { Platform, StatusBar } from "react-native";
 import theme from "./theme";
-import * as ImagePicker from "expo-image-picker";
+import PropTypes from 'prop-types'
+
+import { QuickReplies, User } from "react-native-gifted-chat";
 export const StatusBarHeight = StatusBar.currentHeight;
 export const HeaderHeight = theme.SIZES.BASE * 3.5 + (StatusBarHeight || 0);
 export const iphoneX = ({ height, width }: { height: number; width: number }) =>
@@ -137,3 +139,24 @@ export type DataResponseBotUpdate = {
   };
   update_id: number;
 };
+export interface IMessage {
+  _id: string | number
+  text: string
+  createdAt: Date | number
+  user: User
+  image?: string
+  video?: string
+  audio?: string
+  system?: boolean
+  sent?: boolean
+  received?: boolean
+  pending?: boolean
+  quickReplies?: QuickReplies
+}
+
+export const StylePropType = PropTypes.oneOfType([
+  PropTypes.array,
+  PropTypes.object,
+  PropTypes.number,
+  PropTypes.bool,
+])

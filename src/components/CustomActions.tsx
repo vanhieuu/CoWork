@@ -24,7 +24,7 @@ export interface ActionPressProps {
 }
 
 const CustomActions = ({
-  onSend,
+ 
   wrapperStyle,
   iconTextStyle,
   containerStyle,
@@ -47,10 +47,10 @@ const CustomActions = ({
       async (buttonIndex: any) => {
         switch (buttonIndex) {
           case 0:
-            pickImageAsync(onSend);
+            pickImageAsync();
             return;
           case 1:
-            takePictureAsync(onSend);
+            takePictureAsync();
             return;
           case 2:
             getLocationAsync();

@@ -26,27 +26,22 @@ import {
   TaskProps,
   TelegramBotResponse,
 } from "../../constants/ultil";
-import { getDatabase, onValue } from "firebase/database";
-import * as firebase from "firebase/app";
+
 import {
   getDownloadURL,
   getStorage,
   ref,
-  updateMetadata,
+
   uploadBytes,
 } from "firebase/storage";
 import "firebase/storage";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { TaskAuth } from "../../redux/taskSlice";
+
 const userId = 5231804117;
 
 const TaskWork = () => {
   const route = useRoute<RouteProp<RootStackParamList, "TaskWork">>();
   const params = route.params;
-  const stateRedux = useSelector<RootState, TaskAuth>(
-    (state) => state.task.days
-  );
+ 
   const [show, setShow] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [tasks, setTasks] = React.useState<TaskProps[]>([]);
@@ -106,7 +101,7 @@ const TaskWork = () => {
       );
 
       await uploadBytes(reference, blob, metadata).then(
-        (res) => {
+        (res): void => {
           setLoading(true);
           getDownloadURL(res.ref)
             .then((url) => {

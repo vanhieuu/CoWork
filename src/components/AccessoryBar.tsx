@@ -1,4 +1,4 @@
-import {  StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import {
   getLocationAsync,
@@ -6,12 +6,15 @@ import {
   takePictureAsync,
 } from "./medialUltils";
 import { CoIcon } from ".";
-import { theme } from "../constants";
+import { dataBase, dataFireStore, theme } from "../constants";
 import { IMessage } from "react-native-gifted-chat";
 
+
 interface AccessoryBarProps {
-    onSend: (images: { image: string; }[] ) => void ;
-  isTyping: (isTyping:boolean) => void;
+  onSend: (messages: IMessage[]) => void;
+  isTyping: (isTyping: boolean) => void;
+  pickerImage: () => Promise<void>;
+  takeImage?: ()=> Promise<void>;
 }
 
 interface ButtonProps {
@@ -26,17 +29,17 @@ const Button = ({ onPress, size, color, name, ...props }: ButtonProps) => (
   </TouchableOpacity>
 );
 
-const AccessoryBar = ({ onSend, isTyping }: AccessoryBarProps) => {
+const AccessoryBar = ({ pickerImage, isTyping }: AccessoryBarProps) => {
   return (
     <View style={styles.container}>
       <Button
-        onPress={() => pickImageAsync(onSend)}
+        onPress={pickerImage}
         name="photo"
         size={15}
         color={theme.COLORS.ICON}
       />
       <Button
-        onPress={() => takePictureAsync(onSend)}
+        onPress={() => takePictureAsync()}
         name="camera"
         size={15}
         color={theme.COLORS.ICON}

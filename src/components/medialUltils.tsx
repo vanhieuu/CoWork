@@ -4,15 +4,8 @@ import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
 
 import { Alert } from "react-native";
-import { IMessage } from "react-native-gifted-chat";
-import { useDispatch } from "react-redux";
-import { onGetImage } from "../redux/chatSlice";
-import { addDoc, collection } from "firebase/firestore";
-import { dataBase } from "../constants";
 
-interface MedialUrlProps {
-  setMessage: React.Dispatch<React.SetStateAction<IMessage[]>>
-}
+
 
 export default async function getPermissionAsync(
   permission: Permissions.PermissionType
@@ -38,29 +31,21 @@ export default async function getPermissionAsync(
   return true;
 }
 
-export async function getLocationAsync(
+export async function getLocationAsync() {
   // onSend: (locations: { location: Location.LocationObjectCoords }[]) => void,
-  
-) {
-
-
-
   if (await Location.requestForegroundPermissionsAsync()) {
     const location = await Location.getCurrentPositionAsync({});
     if (location) {
       // onSend([{ location: location.coords }])
-      
-      console.log(location)
+
+      console.log(location);
     }
   }
 }
 
-export async function pickImageAsync(
-
-  onSend: (images: { image: string }[]) => void 
- ) {
-     
-
+export const pickImageAsync = async (
+  
+) => {
   if (await ImagePicker.requestMediaLibraryPermissionsAsync()) {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -69,19 +54,16 @@ export async function pickImageAsync(
 
     if (!result.cancelled) {
     
-    
-      onSend([{ image: result.uri }])
-      console.log(result.uri.substring(result.uri.lastIndexOf("/") + 1))
+      console.log(result.uri.substring(result.uri.lastIndexOf("/") + 1));
       
       return result.uri;
     }
   }
-}
+};
 
-export async function takePictureAsync(
-  onSend: (images: { image: string }[]) => void
-) {
-
+export const takePictureAsync = async (
+  
+) => {
   if (await ImagePicker.requestCameraPermissionsAsync()) {
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
@@ -89,13 +71,11 @@ export async function takePictureAsync(
     });
 
     if (!result.cancelled) {
-      onSend([{ image: result.uri.substring(result.uri.lastIndexOf("/") + 1) }])
+      
+
       console.log(result.uri.substring(result.uri.lastIndexOf("/") + 1));
-     
-      
+
       return result.uri.substring(result.uri.lastIndexOf("/") + 1);
-      
     }
-    
   }
-}
+};
